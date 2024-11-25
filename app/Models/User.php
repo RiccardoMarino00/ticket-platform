@@ -45,4 +45,11 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function tickets()
+    {
+        return $this->belongsTo(Ticket::class);
+    }
+
+
 }
