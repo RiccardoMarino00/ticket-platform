@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreTicketRequest;
+use App\Http\Requests\UpdateTicketRequest;
 use App\Models\Category;
 use App\Models\Operator;
 use App\Models\Ticket;
@@ -24,15 +26,9 @@ class TicketController extends Controller
         return view('tickets.create', compact('categories', 'operators'));
     }
 
-    public function store(Request $request)
+    public function store(StoreTicketRequest $request)
     {
-        $form_data = $request->validate([
-            'title' => 'required|string|max:255', // Cambia i campi in base alla tua tabella
-            'description' => 'required|string',
-            'operator_id' => 'required|exists:operators,id',
-            'category_id' => 'required|exists:categories,id',
-            'status' => 'required|in:open,closed,in-progress', // Enum specifico
-        ]);
+        $form_data = $request->validated();
         $new_ticket = Ticket::create($form_data);
         return redirect()->route('tickets.index', $new_ticket)->with('success', 'Ticket creato con successo!');
     }
@@ -49,15 +45,9 @@ class TicketController extends Controller
         return view('tickets.edit', compact('ticket', 'categories', 'operators'));
     }
 
-    public function update(Request $request, Ticket $ticket)
+    public function update(UpdateTicketRequest $request, Ticket $ticket)
     {
-        $form_data = $request->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'required|string',
-            'operator_id' => 'required|exists:operators,id',
-            'category_id' => 'required|exists:categories,id',
-            'status' => 'required|in:open,closed,in-progress',
-        ]);
+        $form_data = $request->validated();
         $ticket->update($form_data);
         return redirect()->route('tickets.index')->with('success', 'Ticket aggiornato!');
     }
