@@ -8,6 +8,7 @@ use App\Models\Category;
 use App\Models\Operator;
 use App\Models\Ticket;
 use App\Models\User;
+use Auth;
 use Illuminate\Http\Request;
 
 class TicketController extends Controller
@@ -19,18 +20,50 @@ class TicketController extends Controller
         return view('tickets.index', compact('tickets'));
     }
 
-    public function create()
+    public function create(Request $request)
     {
         $categories = Category::all();
-        $operators = Operator::all();
-        return view('tickets.create', compact('categories', 'operators'));
+        $operators = Operator::where('is_available', true)->get();
+        // if (!$operator) {
+        //     return back()->withErrors('Nessun operatore disponibile');
+        // }
+
+        // $ticket = new Ticket();
+        // $ticket->title = $request->input('title');
+        // $ticket->description = $request->input('description');
+        // $ticket->operator_id = $operator->id;
+        // $ticket->save();
+
+        // $operator->is_available = false;
+        // $operator->save();
+
+        return view('tickets.create', compact('categories', 'operators'))->with('success', 'Ticket creato con successo.');
     }
 
     public function store(StoreTicketRequest $request)
     {
         $form_data = $request->validated();
-        $new_ticket = Ticket::create($form_data);
-        return redirect()->route('tickets.index', $new_ticket)->with('success', 'Ticket creato con successo!');
+
+        $operator = Operator::where('is_available', true)->orderBy('id')->first();
+        if (!$operator) {
+            return back()->withErrors('Nessun operatore disponibile');
+        }
+
+        $ticket = new Ticket();
+        $ticket->title = $request->input('title');
+        $ticket->description = $request->input('description');
+        $ticket->operator_id = $operator->id;
+        $ticket->category_id = $request->input('category_id');
+        $ticket->user_id = Auth::id();
+        if ($operator) {
+            $ticket->status = 'Assegnato';
+        }
+        $ticket->save();
+
+        $operator->is_available = false;
+        $operator->save();
+        // $new_ticket = Ticket::create($form_data);
+        return redirect()->route('tickets.index', $ticket)->with('success', 'Ticket creato con successo!');
     }
 
     public function show(Ticket $ticket)

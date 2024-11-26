@@ -24,9 +24,9 @@ class StoreTicketRequest extends FormRequest
         return [
             'title' => 'required|string|max:255', // Cambia i campi in base alla tua tabella
             'description' => 'required|string',
-            'operator_id' => 'required|exists:operators,id',
-            'category_id' => 'required|exists:categories,id',
-            'status' => 'required|in:open,closed,in-progress', // Enum specifico
+            'operator_id' => 'nullable|exists:operators,id',
+            'category_id' => 'nullable|exists:categories,id',
+            'status' => 'in:open,closed,in-progress', // Enum specifico
         ];
     }
 }

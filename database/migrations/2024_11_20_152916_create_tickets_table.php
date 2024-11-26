@@ -14,7 +14,7 @@ return new class extends Migration {
             $table->id();
             $table->string('title');
             $table->text('description');
-            $table->enum('status', ['open', 'closed', 'in-progress']);
+            $table->enum('status', ['In lavorazione', 'Chiuso', 'Assegnato'])->default('In lavorazione');
             // $table->foreignId('operator_id')->constrained()->onDelete('cascade');
             // $table->foreignId('category_id')->constrained()->onDelete('cascade');
             $table->timestamps();
